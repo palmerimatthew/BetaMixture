@@ -7,10 +7,18 @@
 BM_Density(x, Mixture_Parameters, Alphas, Betas, Log = F)
 }
 \arguments{
-\item{website}{the url of a player's page on eliteprospects.com.}
+\item{x}{vector of data points. Will compute the density of them.}
+
+\item{Mixture_Parameters}{Vector of mixture parameters. Must add up to 1 if of length N, or must be within (0, 1) if of length N-1 (reference Alphas and Betas for help with length).}
+
+\item{Alphas}{Vector of Alpha shape parameters. Must be of length N (reference Alphas and Betas for help with length).}
+
+\item{Betas}{Vector of Beta shape parameters. Must be of length N (reference Alphas and Betas for help with length).}
+
+\item{Log}{Boolean to deterime if the log of the density is to be returned.}
 }
 \value{
-data frame (or list of data frames) with data from all the players drafted in the given year.
+Vector of density measures. Same length as input vector x, with cooresponding indices.
 }
 \description{
 returns the density of a given point based on the given parameters of a beta mixture distribution

@@ -20,6 +20,7 @@ BM_Density <- function(x, Mixture_Parameters, Alphas, Betas, Log = F) {
   if (any(typeof(Betas) != "double")) {stop("Betas must contain only numeric elements")}
   #checking Mixture_Parameters ----
   if (any(typeof(Mixture_Parameters) != "double")) {stop("Mixture_Parameter must contain only numeric elements")}
+  if (any(Mixture_Parameters < 0 | Mixture_Parameters > 1)) {stop("Mixture_Parameters must be between 0 and 1")}
   if (length(Mixture_Parameters) == len) {
     if (abs(sum(Mixture_Parameters) - 1) > 0.001) {stop("Fully defined Mixture_Parameter must sum to 1")}
   }
@@ -43,4 +44,70 @@ BM_Density <- function(x, Mixture_Parameters, Alphas, Betas, Log = F) {
   } else {
     return(dens)
   }
+}
+
+
+
+test_error <- function(evaluate_statement, expected_result) {
+  temp = evaluate(evaluate_statement)[[2]]
+  if (length(attr(temp, "class")) == 0) {
+    print(paste("Unexpected Result in", evaluate_statement))
+    return(FALSE)
+  }
+  if (attr(temp, "class")[1] == 'simpleError') {
+    if(temp$message != expected_result) {
+      print(paste("Expected:", expected_result))
+      print(paste("Actual:", temp$message))
+      return(FALSE)
+    } else {return(TRUE)}
+  }
+}
+
+#requires package "evaluate"
+Test_BM_Density <- function() {
+  #testing x checks ----
+  x_check1 = test_error("BM_Density(c('a', 1, 2, 3), 1, 5, 6)",
+                        "x must contain only numeric elements") #numeric elements
+  x_check2 = test_error("BM_Density(c(rep(1, 10000), 'a'), 1, 5, 6)",
+                        "x must contain only numeric elements") #numeric elements
+  x_check3 = test_error("BM_Density(c(3), 1, 5, 6)",
+                        "x not between 0 and 1") #between 0 and 1
+  x_check4 = test_error("BM_Density(c(-1, 2), 1, 5, 6)",
+                        "x not between 0 and 1") #between 0 and 1
+  if(all(x_check1, x_check2, x_check3, x_check4)) {print("Passed all 'x' Tests")}
+
+  #testing Alphas and Betas ----
+  AB_test1 = test_error("BM_Density(0.5, 1, c(1,2), 6)",
+                        "Alphas and Betas must be the same length") #Alphas longer than Betas
+  AB_test2 = test_error("BM_Density(0.5, 1, 6, c(1,2))",
+                        "Alphas and Betas must be the same length") #Betas longer than Alphas
+  AB_test3 = test_error("BM_Density(0.5, 1, c(rep(1, 10000), 'a'), rep(1, 10001))",
+                        "Alphas must contain only numeric elements") #numeric elements
+  AB_test4 = test_error("BM_Density(0.5, 1, rep(1, 10001), c(rep(1, 10000), 'a'))",
+                        "Betas must contain only numeric elements") #numeric elements
+  if(all(AB_test1, AB_test2, AB_test3, AB_test4)) {print("Passed all 'AB' Tests")}
+
+  #testing Mixture_Parameters ----
+  MP_test1 = test_error("BM_Density(0.5, c(0.5, 'a'), 1, 2)",
+                        "Mixture_Parameter must contain only numeric elements") #numeric elements
+  MP_test2 = test_error("BM_Density(0.5, c(-1, 0.5), 1, 2)",
+                        "Mixture_Parameters must be between 0 and 1") # < 0
+  MP_test3 = test_error("BM_Density(0.5, c(0.5, 2), 1, 2)",
+                        "Mixture_Parameters must be between 0 and 1") # > 1
+  MP_test4 = test_error("BM_Density(0.5, c(0.5, 0.25), c(1, 2), c(2, 1))",
+                        "Fully defined Mixture_Parameter must sum to 1") #fully defined < 1
+  MP_test5 = test_error("BM_Density(0.5, c(0.5, 0.5, 0.5), c(1,1,1), c(2,2,2))",
+                        "Fully defined Mixture_Parameter must sum to 1") #full defined > 1
+  MP_test6 = test_error("BM_Density(0.5, c(0.5, 0.75), c(1,1,1), c(1,1,1))",
+                        "Partially defined Mixture_Parameter must sum to between 0 and 1") #partially defined between 0 and 1
+  if(all(MP_test1, MP_test2, MP_test3, MP_test4, MP_test5, MP_test6)) {print("Passed all 'MP' Tests")}
+
+  #testing Log ----
+  Log_test1 = test_error("BM_Density(0.5, c(0.5, 0.49999), c(1,1), c(1,1), 'a')",
+                         "Log must be a boolean") #fully defined Mixture_Parameter sum close to 1 (want to make sure it gets past MP tests, and fails Log test)
+  Log_test2 = test_error("BM_Density(0.5, c(0.5, 0.50001), c(1,1), c(1,1), 'b')",
+                         "Log must be a boolean") #fully defined Mixture_Parameter sum close to 1 (want to make sure it gets past MP tests, and fails Log test)
+  Log_test3 = test_error("BM_Density(0.5, c(0.5, 0.25), c(1,1,1), c(2,2,2), 'a')",
+                         "Log must be a boolean") #partially defined Mixture_Parameter between 0 and 1 (want to make sure it gets past MP tests, and fails Log test)
+  if(all(Log_test1, Log_test2, Log_test3)) {print("Passed all 'Log' Tests")}
 }

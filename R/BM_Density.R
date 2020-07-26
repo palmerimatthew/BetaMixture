@@ -26,6 +26,8 @@ BM_Density <- function(x, Mixture_Parameters, Alphas, Betas, Log = F) {
   }
   else if (length(Mixture_Parameters) == len-1) {
     if (sum(Mixture_Parameters) > 1 | sum(Mixture_Parameters) < 0) {stop("Partially defined Mixture_Parameter must sum to between 0 and 1")}
+    temp = sum(Mixture_Parameters)
+    Mixture_Parameters = c(Mixture_Parameters, 1-temp)
   }
   else {stop("Mixture_Parameter must be either the same length or one smaller compared to Alphas/Betas")}
   #checking log ----
@@ -61,6 +63,10 @@ test_error <- function(evaluate_statement, expected_result) {
       return(FALSE)
     } else {return(TRUE)}
   }
+}
+
+Within_error_bounds <- function(BM_dens_value, expression_evaluation, threshold) {
+  return(all(abs(BM_dens_value - expression_evaluation) < threshold))
 }
 
 #requires package "evaluate"
@@ -110,4 +116,15 @@ Test_BM_Density <- function() {
   Log_test3 = test_error("BM_Density(0.5, c(0.5, 0.25), c(1,1,1), c(2,2,2), 'a')",
                          "Log must be a boolean") #partially defined Mixture_Parameter between 0 and 1 (want to make sure it gets past MP tests, and fails Log test)
   if(all(Log_test1, Log_test2, Log_test3)) {print("Passed all 'Log' Tests")}
+
+  #testing valid parameters ----
+  #fully defined Mixture_Parameters
+  Valid_test1 = Within_error_bounds(BM_Density(0.5, c(0.4, 0.6), c(2, 10), c(5, 1), Log = F),
+                                    0.4*dbeta(0.5, 2, 5) + 0.6*dbeta(0.5, 10, 1), 0.001)
+  Valid_test2 = Within_error_bounds(BM_Density(0.5, c(0.4, 0.6), c(2, 10), c(5, 1), Log = T),
+                                    log(0.4*dbeta(0.5, 2, 5) + 0.6*dbeta(0.5, 10, 1)), 0.001)
+  #Partially defined Mixture_Parameters
+  Valid_test3 = Within_error_bounds(BM_Density(c(0.25, 0.75, 0.5), c(0.3, 0.6), c(1, 2, 3), c(10, 5, 15), Log = F),
+                                    0.3*dbeta(c(0.25, 0.75, 0.5), 1, 10) + 0.6*dbeta(c(0.25, 0.75, 0.5), 2, 5) + 0.1*dbeta(c(0.25, 0.75, 0.5), 3, 15), 0.001)
+
 }

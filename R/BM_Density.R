@@ -10,9 +10,29 @@
 #' @export
 
 BM_Density <- function(x, Mixture_Parameters, Alphas, Betas, Log = F) {
-  # TODO: add pre-condition checks for Mixture_Parameters, Alphas, and Betas
+  #checking x ----
+  if (any(typeof(x) != "double")) {stop("x must contain only numeric elements")}
+  if (any(x < 0 | x > 1)) {stop("x not between 0 and 1")}
+  #checking Alphas and Betas ----
+  len = length(Alphas)
+  if (len != length(Betas)) {stop("Alphas and Betas must be the same length")}
+  if (any(typeof(Alphas) != "double")) {stop("Alphas must contain only numeric elements")}
+  if (any(typeof(Betas) != "double")) {stop("Betas must contain only numeric elements")}
+  #checking Mixture_Parameters ----
+  if (any(typeof(Mixture_Parameters) != "double")) {stop("Mixture_Parameter must contain only numeric elements")}
+  if (length(Mixture_Parameters) == len) {
+    if (abs(sum(Mixture_Parameters) - 1) > 0.001) {stop("Fully defined Mixture_Parameter must sum to 1")}
+  }
+  else if (length(Mixture_Parameters) == len-1) {
+    if (sum(Mixture_Parameters) > 1 | sum(Mixture_Parameters) < 0) {stop("Partially defined Mixture_Parameter must sum to between 0 and 1")}
+  }
+  else {stop("Mixture_Parameter must be either the same length or one smaller compared to Alphas/Betas")}
+  #checking log ----
+  if (typeof(Log) != 'logical') {stop("Log must be a boolean")}
 
-  #actual code to compute mixture density for given points
+
+
+  #actual code to compute mixture density for given points ----
   len = length(Alphas)
   dens = numeric(length(x))
   for (i in 1:len) {

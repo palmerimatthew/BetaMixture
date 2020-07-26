@@ -12,9 +12,10 @@ BM_Fit <- function(x, K, threshold, seed = NA) {
 
   #setup ----
   if (!is.na(seed)){set.seed(seed)}
-  Params = seq(0, 1, length.out = K+1)[2]
+  Mix_Params = seq(0, 1, length.out = K+1)[2]
   Mix_Params = rep(Mix_Params, K)
   Component_Params = MoM_Calculation(sort(x), K, length(x))
+  Component_Params = M_Step(x, Mix_Params, Component_Params)
   Alphas = Component_Params[seq(1, length(Component_Params), by=2)]
   Betas = Component_Params[seq(2, length(Component_Params), by=2)]
   current_log_likelihood = sum(BM_Density(x, Mix_Params, Alphas, Betas, T))
@@ -23,17 +24,21 @@ BM_Fit <- function(x, K, threshold, seed = NA) {
   iteration_results = matrix(nrow = 100, ncol = 2+3*K)
   iteration = 1
   iteration_results[1,] = c(iteration, Mix_Params, Alphas, Betas, current_log_likelihood)
-  #starting iterative process ----
+  #iterative process ----
   while (current_log_likelihood - previous_log_likelihood > threshold) {
     iteration = iteration + 1
+    #E step
     Mix_Params = E_Step(x, Alphas, Betas)
+    #M step
     Component_Params = M_Step(x, Mix_Params, Component_Params)
     Alphas = Component_Params[seq(1, length(Component_Params), by=2)]
-    Betas = Component_Params[seq(1, length(Component_Params), by=2)]
+    Betas = Component_Params[seq(2, length(Component_Params), by=2)]
     previous_log_likelihood = current_log_likelihood
     current_log_likelihood = sum(BM_Density(x, Mix_Params, Alphas, Betas, T))
-    iteration_results[2,] = c(iteration, Mix_Params, Alphas, Betas, current_log_likelihood)
+    iteration_results[iteration,] = c(iteration, Mix_Params, Alphas, Betas, current_log_likelihood)
   }
+  #preparing stuff for return statements ----
+  iteration_results <- as.data.frame(iteration_results)
 }
 
 #Expectation step ----
@@ -53,7 +58,15 @@ E_Step <- function(x, Alphas, Betas) {
 
 #Maximization step ----
 M_Step <- function(x, Mixture_Params, Old_Component_Params) {
-
+  #likelihood equation for numerical MLEs
+  likelihood <- function(theta, x) {
+    if (any(theta <= 0)) {return(NA)}
+    alphas = theta[seq(1, length(theta), by=2)]
+    betas = theta[seq(2, length(theta), by=2)]
+    return(BM_Density(x, Mixture_Params, alphas, betas, Log = T))
+  }
+  New_Component_Params = maxLik::maxLik(likelihood, start = Old_Component_Params, x = x)
+  return(New_Component_Params$estimate)
 }
 
 # Method of Moments initial values for component parameters ----

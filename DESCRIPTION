@@ -1,15 +1,17 @@
 Package: BetaMixture
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Fit Beta Mixture Densities
+Version: 0.0.1
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Matthew",
+           family = "Palmeri",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to
-    pick a license
+           email = "matthewpalmeri@outlook.com")
+Description: This package contains functions related to fitting mixtures of beta distributions. Included in this are functions relating to pdfs for mixture of beta distributions, and methods to fit these to datasets using a modified version of the EM algorithm.
+Depends: R (>= 3.5.3)
+Imports: 
+    dplyr (>= 0.8.3)
+    maxLik (>= 1.3-8)
+License: MIT | file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

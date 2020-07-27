@@ -4,7 +4,7 @@
 \alias{BM_Fit}
 \title{Beta Mixture Density Fitting Procedure}
 \usage{
-BM_Fit(x, K, threshold, seed = NA)
+BM_Fit(x, K, threshold = 1e-04, seed = NA)
 }
 \arguments{
 \item{x}{vector of data points. Will fit beta mixture density to this.}
@@ -16,7 +16,7 @@ BM_Fit(x, K, threshold, seed = NA)
 \item{seed}{Sets seed for random processes. Should only be used if replicable results are needed.}
 }
 \value{
-returns best fitting parameters and results from each iteration of the EM algorithm
+returns best fitting parameters and results from each iteration of the EM algorithm.
 }
 \description{
 Fits a Beta Mixture density to a given set of data

@@ -16,7 +16,7 @@ BM_Fit(x, K, threshold, seed = NA)
 \item{seed}{Sets seed for random processes. Should only be used if replicable results are needed.}
 }
 \value{
-TODO
+returns best fitting parameters and results from each iteration of the EM algorithm
 }
 \description{
 Fits a Beta Mixture density to a given set of data

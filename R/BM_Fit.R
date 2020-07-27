@@ -47,7 +47,7 @@ BM_Fit <- function(x, K, threshold = 0.0001, seed = NA) {
   columns <- c(columns, "Log_Likelihood")
   colnames(iteration_results) <- columns
   #returning results
-  return(list(Mix_Params = Mix_Params, Alpha = Alphas, Beta = Betas, Iterations = iteration_results))
+  return(list(Mix_Params = Mix_Params, Alpha = Alphas, Beta = Betas, Iterations = iteration_results, LogLik = current_log_likelihood))
 }
 
 #Expectation step ----

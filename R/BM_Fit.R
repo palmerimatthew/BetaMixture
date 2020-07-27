@@ -7,7 +7,7 @@
 #' @param seed Sets seed for random processes. Should only be used if replicable results are needed.
 #' @return returns best fitting parameters and results from each iteration of the EM algorithm
 #' @export
-BM_Fit <- function(x, K, threshold, seed = NA) {
+BM_Fit <- function(x, K, threshold = 0.0001, seed = NA) {
   #TODO: pre-condition tests
 
   #setup ----
@@ -47,7 +47,7 @@ BM_Fit <- function(x, K, threshold, seed = NA) {
   columns <- c(columns, "Log_Likelihood")
   colnames(iteration_results) <- columns
   #returning results
-  return(Mix_Params = Mix_Params, Alpha = Alphas, Beta = Betas, Iterations = iteration_results)
+  return(list(Mix_Params = Mix_Params, Alpha = Alphas, Beta = Betas, Iterations = iteration_results))
 }
 
 #Expectation step ----

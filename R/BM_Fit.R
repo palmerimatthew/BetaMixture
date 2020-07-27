@@ -5,7 +5,7 @@
 #' @param K Number of distributions composing mixture
 #' @param threshold Determines "accuracy" of final returned parameters
 #' @param seed Sets seed for random processes. Should only be used if replicable results are needed.
-#' @return returns best fitting parameters and results from each iteration of the EM algorithm.
+#' @return returns best fitting parameters and results from each iteration of the EM algorithm
 #' @export
 BM_Fit <- function(x, K, threshold = 0.0001, seed = NA) {
   #TODO: pre-condition tests
